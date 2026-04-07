@@ -73,7 +73,7 @@ proc new*(
     salt: string.fromBytes(generateBytes(rng[], 8)),
     registered: initOffsettedSeq[RegisteredData](),
     expiredDT: Moment.now() - 1.days,
-    sema: newAsyncSemaphore(SemaphoreDefaultSize),
+    sema: semaphore.newAsyncSemaphore(SemaphoreDefaultSize),
     minDuration: minDuration,
     maxDuration: maxDuration,
     minTTL: minTTL,

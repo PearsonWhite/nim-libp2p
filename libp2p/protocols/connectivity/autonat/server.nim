@@ -28,7 +28,7 @@ logScope:
   topics = "libp2p autonat"
 
 type Autonat* = ref object of LPProtocol
-  sem: AsyncSemaphore
+  sem: semaphore.AsyncSemaphore
   switch*: Switch
   dialTimeout: Duration
 
@@ -163,7 +163,7 @@ proc new*(
     T: typedesc[Autonat], switch: Switch, semSize: int = 1, dialTimeout = 15.seconds
 ): T =
   let autonat =
-    T(switch: switch, sem: newAsyncSemaphore(semSize), dialTimeout: dialTimeout)
+    T(switch: switch, sem: semaphore.newAsyncSemaphore(semSize), dialTimeout: dialTimeout)
   proc handleStream(
       conn: Connection, proto: string
   ) {.async: (raises: [CancelledError]).} =

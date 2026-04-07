@@ -239,7 +239,7 @@ proc upgrader(
     raise newException(UpgradeError, "catchable error upgrader: " & e.msg, e)
 
 proc upgradeMonitor(
-    switch: Switch, trans: Transport, conn: Connection, upgrades: AsyncSemaphore
+    switch: Switch, trans: Transport, conn: Connection, upgrades: semaphore.AsyncSemaphore
 ) {.async: (raises: []).} =
   var upgradeSuccessful = false
   try:
@@ -263,7 +263,7 @@ proc accept(s: Switch, transport: Transport) {.async: (raises: []).} =
   ## switch accept loop, ran for every transport
   ##
 
-  let upgrades = newAsyncSemaphore(ConcurrentUpgrades)
+  let upgrades = semaphore.newAsyncSemaphore(ConcurrentUpgrades)
   while transport.running:
     var conn: Connection
     try:

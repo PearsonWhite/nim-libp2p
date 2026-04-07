@@ -64,8 +64,8 @@ type
 
   ConnManager* = ref object of RootObj
     maxConnsPerPeer: int
-    inSema*: AsyncSemaphore
-    outSema*: AsyncSemaphore
+    inSema*: semaphore.AsyncSemaphore
+    outSema*: semaphore.AsyncSemaphore
     muxed: Table[PeerId, seq[Muxer]]
     connEvents: array[ConnEventKind, OrderedSet[ConnEventHandler]]
     peerEvents: array[PeerEventKind, OrderedSet[PeerEventHandler]]
@@ -86,12 +86,12 @@ proc new*(
     maxIn = -1,
     maxOut = -1,
 ): ConnManager =
-  var inSema, outSema: AsyncSemaphore
+  var inSema, outSema: semaphore.AsyncSemaphore
   if maxIn > 0 or maxOut > 0:
-    inSema = newAsyncSemaphore(maxIn)
-    outSema = newAsyncSemaphore(maxOut)
+    inSema = semaphore.newAsyncSemaphore(maxIn)
+    outSema = semaphore.newAsyncSemaphore(maxOut)
   elif maxConnections > 0:
-    inSema = newAsyncSemaphore(maxConnections)
+    inSema = semaphore.newAsyncSemaphore(maxConnections)
     outSema = inSema
   else:
     raiseAssert "Invalid connection counts!"
@@ -347,7 +347,7 @@ proc getOutgoingSlot*(
     raise newTooManyConnectionsError()
   return ConnectionSlot(connManager: c, direction: Out)
 
-func semaphore(c: ConnManager, dir: Direction): AsyncSemaphore {.inline.} =
+func semaphore(c: ConnManager, dir: Direction): semaphore.AsyncSemaphore {.inline.} =
   return if dir == In: c.inSema else: c.outSema
 
 proc slotsAvailable*(c: ConnManager, dir: Direction): int =
